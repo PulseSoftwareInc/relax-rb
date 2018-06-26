@@ -12,7 +12,10 @@ module Relax
       end
 
       if !defined?(@@conn)
-        @@conn = ConnectionPool.new(timeout: 1, size: 2) do
+        timeout = ENV.fetch('RELAX_REDIS_CONN_POOL_TIMEOUT') { 1 }
+        size = ENV.fetch('RELAX_REDIS_CONN_POOL_SIZE') { 2 }
+
+        @@conn = ConnectionPool.new(timeout: timeout.to_i, size: size.to_i) do
           Redis.new(url: redis_uri, db: 0)
         end
       end
