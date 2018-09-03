@@ -17,11 +17,11 @@ module Relax
       # current event in the 30s grace period. If event doesn't complete within
       # 30s we'll receive a SIGKILL.
       Signal.trap('TERM') {
-        polling = false
+        self.polling = false
       }
 
       Signal.trap('INT') {
-        polling = false
+        self.polling = false
       }
 
       self.log("Listening for Relax Events...")
