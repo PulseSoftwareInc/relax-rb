@@ -27,7 +27,7 @@ module Relax
       self.log("Listening for Relax Events...")
 
       while polling do
-        queue_name, event_json = redis.with { |c| c.lpop(relax_events_queue) }
+        queue_name, event_json = redis.with { |c| c.blpop(relax_events_queue) }
 
         if queue_name == relax_events_queue
           event = Event.new(JSON.parse(event_json))
