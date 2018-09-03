@@ -16,26 +16,22 @@ module Relax
       # Gracefully handle SIGTERM, stop polling for more events and complete the
       # current event in the 30s grace period. If event doesn't complete within
       # 30s we'll receive a SIGKILL.
-      Signal.trap('TERM') {
-        self.polling = false
-      }
+      # Signal.trap('TERM') {
+      #   self.polling = false
+      # }
 
-      Signal.trap('INT') {
-        self.polling = false
-      }
+      # Signal.trap('INT') {
+      #   self.polling = false
+      # }
 
       self.log("Listening for Relax Events...")
 
       while polling do
-        begin
-          queue_name, event_json = redis.with { |c| c.lpop(relax_events_queue) }
+        queue_name, event_json = redis.with { |c| c.lpop(relax_events_queue) }
 
-          if queue_name == relax_events_queue
-            event = Event.new(JSON.parse(event_json))
-            callback.call(event) if callback
-          end
-        rescue SignalException => e
-          self.log("Got signaled #{e.message}")
+        if queue_name == relax_events_queue
+          event = Event.new(JSON.parse(event_json))
+          callback.call(event) if callback
         end
       end
 
