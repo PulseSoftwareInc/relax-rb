@@ -18,7 +18,7 @@ describe Relax::EventListener do
         @redis = Redis.new(uri: URI.parse("redis://localhost:6379"), db: 0)
         @thread = Thread.new { Relax::EventListener.listen! }
 
-        Relax::EventListener.callback = Proc.new { |e| @event = e; @thread.join }
+        Relax::EventListener.callback = Proc.new { |e| @event = e; Thread.current.terminate }
 
         @redis.rpush(ENV['RELAX_EVENTS_QUEUE'], {
           type: 'message_new',
@@ -36,6 +36,7 @@ describe Relax::EventListener do
 
       after do
         ENV['RELAX_EVENTS_QUEUE'] = nil
+        @thread.join
       end
 
       it 'should callback with the event' do
